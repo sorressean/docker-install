@@ -1,8 +1,12 @@
 #!/bin/sh
+set -e  # Exit on error
+
 # Script to install Docker on Debian-based systems
 # Run this script as root
-
-set -e  # Exit on error
+if [ "$EUID" -ne 0 ]; then
+echo "This script must be run as root."
+exit 1
+fi
 
 # Function to check if a command exists
 command_exists() {
@@ -52,7 +56,7 @@ echo "Adding Docker repository..."
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \n  https://download.docker.com/linux/debian \n  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Update package list again
+# Update package list to pull new docker packages
 echo "Updating package list after adding Docker repo..."
 apt-get update
 
@@ -77,3 +81,4 @@ if [ -n "$USER_TO_ADD" ]; then
 fi
 
 echo "Docker installation complete."
+
